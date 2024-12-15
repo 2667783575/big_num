@@ -18,37 +18,33 @@ impl SimpleFloat {
         }
     }
     pub fn build(str: &str) -> SimpleFloat {
-        let vec: Vec<char> = str.trim().chars().collect();
+        let sign = false;
         let mut v: Vec<bool> = Vec::new();
-        v.resize(vec.len(), false);
-        let mut lower_num = 0;
-        let mut bit = false;
-        for i in 0..vec.len() {
-            if vec[vec.len() - i - 1].eq(&'.') {
-                lower_num = i;
-                bit = true;
-            } else if !bit {
-                let o: u32 = vec[vec.len() - i - 1]
-                    .to_digit(2)
-                    .expect("the str should be valid!");
-                v[i] = 1 == o;
-            } else {
-                let o: u32 = vec[vec.len() - i - 1]
-                    .to_digit(2)
-                    .expect("the str should be valid!");
-                v[i - 1] = 1 == o;
-            }
-        }
-        let mut len = vec.len() - lower_num;
-        if bit {
+        let mut len = str.len();
+        if str.contains("+") || str.contains("-") {
             len -= 1;
-            v.pop();
+        }
+        if str.contains(".") {
+            len -= 1;
+        }
+        v.resize(len, false);
+        let mut delta = 0;
+        let mut lower_num = 0;
+        for (i, c) in str.trim().chars().rev().enumerate().take(str.len()) {
+            if c.is_digit(2) {
+                v[i - delta] = 1 == c.to_digit(2).expect("wrong");
+            } else {
+                if c.eq(&'.') {
+                    lower_num = i;
+                }
+                delta += 1;
+            }
         }
         SimpleFloat {
             seq: v,
-            upper_num: len,
+            upper_num: len - lower_num,
             lower_num,
-            sign: false,
+            sign,
         }
     }
 }
@@ -206,12 +202,12 @@ mod tests {
             lower_num: 2,
             sign: false,
         };
-        let c = SimpleFloat::build("1.111");
+        let c = SimpleFloat::build("-1.111");
         let d = SimpleFloat {
             seq: vec![true, true, true, true],
             upper_num: 1,
             lower_num: 3,
-            sign: false,
+            sign: true,
         };
         let x = SimpleFloat::build("10.100101");
         let y = SimpleFloat {
