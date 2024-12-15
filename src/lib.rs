@@ -5,6 +5,7 @@ pub struct SimpleFloat {
     seq: Vec<bool>,
     upper_num: usize,
     lower_num: usize,
+    sign: bool,
 }
 
 impl SimpleFloat {
@@ -13,6 +14,7 @@ impl SimpleFloat {
             seq: Vec::new(),
             upper_num,
             lower_num,
+            sign: false,
         }
     }
     pub fn build(str: &str) -> SimpleFloat {
@@ -42,11 +44,11 @@ impl SimpleFloat {
             len -= 1;
             v.pop();
         }
-
         SimpleFloat {
             seq: v,
             upper_num: len,
             lower_num,
+            sign: false,
         }
     }
 }
@@ -125,7 +127,28 @@ impl ops::Add<SimpleFloat> for SimpleFloat {
             seq: v,
             upper_num: up,
             lower_num: low,
+            sign: false,
         }
+    }
+}
+
+impl ops::Index<usize> for SimpleFloat {
+    type Output = bool;
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.seq[index]
+    }
+}
+
+impl ops::IndexMut<usize> for SimpleFloat {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.seq[index]
+    }
+}
+
+impl ops::Sub<SimpleFloat> for SimpleFloat {
+    type Output = SimpleFloat;
+    fn sub(self, rhs: SimpleFloat) -> Self::Output {
+        SimpleFloat::new(1, 1)
     }
 }
 
@@ -159,11 +182,13 @@ mod tests {
             seq: vec![false, true, true, true, false],
             upper_num: 3,
             lower_num: 2,
+            sign: false,
         };
         let b = SimpleFloat {
             seq: vec![false, true, true, true, false],
             upper_num: 2,
             lower_num: 3,
+            sign: false,
         };
         let c = a + b;
         assert_eq!(c.seq, vec![false, true, false, true, false, true, false]);
@@ -179,24 +204,28 @@ mod tests {
             seq: vec![true, true, true, true],
             upper_num: 2,
             lower_num: 2,
+            sign: false,
         };
         let c = SimpleFloat::build("1.111");
         let d = SimpleFloat {
             seq: vec![true, true, true, true],
             upper_num: 1,
             lower_num: 3,
+            sign: false,
         };
         let x = SimpleFloat::build("10.100101");
         let y = SimpleFloat {
             seq: vec![true, false, true, false, false, true, false, true],
             upper_num: 2,
             lower_num: 6,
+            sign: false,
         };
         let m = SimpleFloat::build("1.0");
         let n = SimpleFloat {
             seq: vec![false, true],
             upper_num: 1,
             lower_num: 1,
+            sign: false,
         };
         assert_eq!(a, b);
         assert_eq!(c, d);
@@ -207,6 +236,7 @@ mod tests {
             seq: vec![true, false, true],
             upper_num: 2,
             lower_num: 1,
+            sign: false,
         };
         assert_eq!(x, y);
 
@@ -215,6 +245,7 @@ mod tests {
             seq: vec![true, true],
             upper_num: 1,
             lower_num: 1,
+            sign: false,
         };
         assert_eq!(x, y);
     }
